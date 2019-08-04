@@ -3,16 +3,16 @@ require 'json'
 require 'twitter'
 require 'sinatra'
 
-client = Twitter::REST::Client.new do |config|
+twclient = Twitter::REST::Client.new do |config|
   config.consumer_key        = "7p25lNwshZs7U3KXTtiYOC1eQ"
   config.consumer_secret     = "4Cw01o1okDDPusMbI7tOepxCIqrUuj9SCGWS4P0wyRsyeNn9Hk"
   config.access_token        = "843737242015211522-0Xs9oPLR9T2SKZ8RdhWFEskeKx44wlK"
   config.access_token_secret = "wODQ3Oc3UwPY9fUGySPQm0psYTsKLddzfLKSm50N9i35S"
 end
 
-puts client.user(928272501943046149).screen_name
+puts twclient.user(928272501943046149).screen_name
 
-def lineclient
+def client
   @lineclient ||= Line::Bot::Client.new { |config|
     config.channel_id = "1605768875"
     config.channel_secret = "bb9c0628a8d421316b5d383de5e5883c"
