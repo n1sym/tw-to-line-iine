@@ -26,7 +26,7 @@ def main(event:, context:)
   type: 'text',
   text: 'hello'
 }
-  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",message)
+  client.push_message("Ua242d28113c3485e05f8ed896887db25",message)
 end
 
 get '/' do
@@ -47,10 +47,17 @@ post '/callback' do
     when Line::Bot::Event::Message
       case event.type
       when Line::Bot::Event::MessageType::Text
-        message = {
-          type: 'text',
-          text: event.message['text']
-        }
+        if event.message['text'] == "hello"
+          message = {
+            type: 'text',
+            text: 'hello'
+          }
+        else
+          message = {
+            type: 'text',
+            text: event.message['text']
+          }
+        end  
         client.reply_message(event['replyToken'], message)
       when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
         response = client.get_message_content(event.message['id'])
