@@ -50,7 +50,7 @@ post '/callback' do
         if event.message['text'] == "hello"
           message = {
             type: 'text',
-            text: 'hello'
+            text: 'hello!'
           }
         else
           message = {
