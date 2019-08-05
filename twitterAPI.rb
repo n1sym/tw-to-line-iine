@@ -3,14 +3,8 @@ require 'json'
 require 'twitter'
 require 'sinatra'
 
-twclient = Twitter::REST::Client.new do |config|
-  config.consumer_key        = "7p25lNwshZs7U3KXTtiYOC1eQ"
-  config.consumer_secret     = "4Cw01o1okDDPusMbI7tOepxCIqrUuj9SCGWS4P0wyRsyeNn9Hk"
-  config.access_token        = "843737242015211522-0Xs9oPLR9T2SKZ8RdhWFEskeKx44wlK"
-  config.access_token_secret = "wODQ3Oc3UwPY9fUGySPQm0psYTsKLddzfLKSm50N9i35S"
-end
 
-puts twclient.user(928272501943046149).screen_name
+
 
 def client
   @lineclient ||= Line::Bot::Client.new { |config|
@@ -65,6 +59,13 @@ def twclient.get_all_tweets(user)
 end
 
 def getiine
+  twclient = Twitter::REST::Client.new do |config|
+    config.consumer_key        = "7p25lNwshZs7U3KXTtiYOC1eQ"
+    config.consumer_secret     = "4Cw01o1okDDPusMbI7tOepxCIqrUuj9SCGWS4P0wyRsyeNn9Hk"
+    config.access_token        = "843737242015211522-0Xs9oPLR9T2SKZ8RdhWFEskeKx44wlK"
+    config.access_token_secret = "wODQ3Oc3UwPY9fUGySPQm0psYTsKLddzfLKSm50N9i35S"
+  end
+
   ago = (((Time.now).to_s.slice(/\d+/).to_i)-1).to_s #1年前
   kyonen = ago + (Time.now).to_s.slice(4, 6)
   nitizi = kyonen + "のいいね"
