@@ -109,7 +109,7 @@ def mes(event)
       text: 'hello!'
     }
   elsif event.message['text'] == "get"
-    getline
+    getiine
   else
     message = {
       type: 'text',
