@@ -3,7 +3,7 @@ require 'json'
 require 'twitter'
 require 'sinatra'
 
-def twclient 
+def client 
   @twclient ||= Twitter::REST::Client.new { |config|
     config.consumer_key        = "7p25lNwshZs7U3KXTtiYOC1eQ"
     config.consumer_secret     = "4Cw01o1okDDPusMbI7tOepxCIqrUuj9SCGWS4P0wyRsyeNn9Hk"
@@ -13,7 +13,7 @@ def twclient
 end
 
 
-def client
+def lineclient
   @lineclient ||= Line::Bot::Client.new { |config|
     config.channel_id = "1605768875"
     config.channel_secret = "bb9c0628a8d421316b5d383de5e5883c"
@@ -28,7 +28,7 @@ def toLINE(m)
   type: 'text',
   text: m
   }
-  client.push_message("Ua242d28113c3485e05f8ed896887db25",message)
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",message)
 end
 
 def toLINEi(url)
@@ -37,7 +37,7 @@ def toLINEi(url)
       originalContentUrl: url,
       previewImageUrl: "https://example.com/preview.jpg"
   }
-  client.push_message("Ua242d28113c3485e05f8ed896887db25",imagem)
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",imagem)
 end
 
 def toLINEv(url)
@@ -46,7 +46,7 @@ def toLINEv(url)
         originalContentUrl: url,
         previewImageUrl: "https://example.com/preview.jpg"
     }
-  client.push_message("Ua242d28113c3485e05f8ed896887db25",video)
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",video)
 end
 
 
@@ -57,7 +57,7 @@ def collect_with_max_id(collection=[], max_id=nil, &block)
   response.empty? ? collection.flatten : collect_with_max_id(collection, response.last.id - 1, &block)
 end
 
-def self.get_all_tweets(user)
+def client.get_all_tweets(user)
   collect_with_max_id do |max_id|
     options = {count: 200, include_rts: true}
     options[:max_id] = max_id unless max_id.nil?
@@ -73,7 +73,7 @@ def getiine
   toLINE(nitizi)
   tw = []
   
-  twclient.get_all_tweets(928272501943046149).each do |tweet|
+  client.get_all_tweets(928272501943046149).each do |tweet|
     
     if tweet.created_at.to_s.include?(kyonen)
       tw << tweet
@@ -100,6 +100,7 @@ def getiine
   end
 end
 
+
 get '/' do
   "Hello World"
 end
@@ -118,7 +119,7 @@ def mes(event)
       text: event.message['text']
     }
   end  
-  client.reply_message(event['replyToken'], message)
+  lineclient.reply_message(event['replyToken'], message)
 end
 
 
@@ -126,11 +127,11 @@ post '/callback' do
   body = request.body.read
 
   signature = request.env['HTTP_X_LINE_SIGNATURE']
-  unless client.validate_signature(body, signature)
+  unless lineclient.validate_signature(body, signature)
     error 400 do 'Bad Request' end
   end
 
-  events = client.parse_events_from(body)
+  events = lineclient.parse_events_from(body)
   events.each { |event|
     case event
     when Line::Bot::Event::Message
@@ -138,7 +139,7 @@ post '/callback' do
       when Line::Bot::Event::MessageType::Text
         mes(event)
       when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
-        response = client.get_message_content(event.message['id'])
+        response = lineclient.get_message_content(event.message['id'])
         tf = Tempfile.open("content")
         tf.write(response.body)
       end
