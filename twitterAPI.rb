@@ -27,7 +27,7 @@ def toLINE(m)
   type: 'text',
   text: m
   }
-  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",message)
+  client.push_message("Ua242d28113c3485e05f8ed896887db25",message)
 end
 
 def toLINEi(url)
@@ -36,7 +36,7 @@ def toLINEi(url)
       originalContentUrl: url,
       previewImageUrl: "https://example.com/preview.jpg"
   }
-  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",imagem)
+  client.push_message("Ua242d28113c3485e05f8ed896887db25",imagem)
 end
 
 def toLINEv(url)
@@ -45,7 +45,7 @@ def toLINEv(url)
         originalContentUrl: url,
         previewImageUrl: "https://example.com/preview.jpg"
     }
-  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",video)
+  client.push_message("Ua242d28113c3485e05f8ed896887db25",video)
 end
 
 
@@ -56,7 +56,7 @@ def collect_with_max_id(collection=[], max_id=nil, &block)
   response.empty? ? collection.flatten : collect_with_max_id(collection, response.last.id - 1, &block)
 end
 
-def client.get_all_tweets(user)
+def twclient.get_all_tweets(user)
   collect_with_max_id do |max_id|
     options = {count: 200, include_rts: true}
     options[:max_id] = max_id unless max_id.nil?
@@ -71,7 +71,7 @@ def getiine
   toLINE(nitizi)
   tw = []
   
-  client.get_all_tweets(928272501943046149).each do |tweet|
+  twclient.get_all_tweets(928272501943046149).each do |tweet|
     
     if tweet.created_at.to_s.include?(kyonen)
       tw << tweet
