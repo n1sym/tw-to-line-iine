@@ -20,18 +20,108 @@ def client
   }
 end
 
+ago = (((Time.now).to_s.slice(/\d+/).to_i)-1).to_s #1年前
+kyonen = ago + (Time.now).to_s.slice(4, 6)
 
-def main(event:, context:)
+def toLINE(m)
   message = {
   type: 'text',
-  text: 'hello'
-}
-  client.push_message("Ua242d28113c3485e05f8ed896887db25",message)
+  text: m
+  }
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",message)
+end
+
+def toLINEi(url)
+  imagem = {
+      type: "image",       
+      originalContentUrl: url,
+      previewImageUrl: "https://example.com/preview.jpg"
+  }
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",imagem)
+end
+
+def toLINEv(url)
+  video = {
+        type: "video",       
+        originalContentUrl: url,
+        previewImageUrl: "https://example.com/preview.jpg"
+    }
+  lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",video)
+end
+
+
+
+def collect_with_max_id(collection=[], max_id=nil, &block)
+  response = yield(max_id)
+  collection += response
+  response.empty? ? collection.flatten : collect_with_max_id(collection, response.last.id - 1, &block)
+end
+
+def client.get_all_tweets(user)
+  collect_with_max_id do |max_id|
+    options = {count: 200, include_rts: true}
+    options[:max_id] = max_id unless max_id.nil?
+    favorites(user, options)
+  end
+end
+
+def getiine
+  nitizi = kyonen + "のいいね"
+  toLINE(nitizi)
+  tw = []
+  
+  client.get_all_tweets(928272501943046149).each do |tweet|
+    
+    if tweet.created_at.to_s.include?(kyonen)
+      tw << tweet
+    end
+  end
+  
+  tw = tw.sort_by {|t| t.created_at }
+  
+  tw.each do |tweet|
+    if tweet.media[0]
+      if tweet.media[0].type == "animated_gif" || tweet.media[0].type == "video"
+        toLINEv(tweet.media[0].video_info.variants[0].url)
+      elsif tweet.media[0].type == "photo"  
+        toLINEi(tweet.media[0].media_url_https)  if tweet.media[0]
+        toLINEi(tweet.media[1].media_url_https)  if tweet.media[1]
+        toLINEi(tweet.media[2].media_url_https)  if tweet.media[2]
+        toLINEi(tweet.media[3].media_url_https)  if tweet.media[3]
+      end
+      
+      toLINE(tweet.full_text)
+      toLINE(tweet.url) unless tweet.media[0]
+      
+    end
+  end
 end
 
 get '/' do
   "Hello World"
 end
+
+def mes(event)
+  if event.message['text'] == "hello"
+    message = {
+      type: 'text',
+      text: 'hello!'
+    }
+  elsif event.message['text'] == "image"
+    message = {
+      type: "image",       
+      originalContentUrl: "https://pbs.twimg.com/media/EA1s5InU8AAnUmY.jpg",
+      previewImageUrl: "https://example.com/preview.jpg"
+    }
+  else
+    message = {
+      type: 'text',
+      text: event.message['text']
+    }
+  end  
+  client.reply_message(event['replyToken'], message)
+end
+
 
 post '/callback' do
   body = request.body.read
@@ -47,18 +137,7 @@ post '/callback' do
     when Line::Bot::Event::Message
       case event.type
       when Line::Bot::Event::MessageType::Text
-        if event.message['text'] == "hello"
-          message = {
-            type: 'text',
-            text: 'hello!'
-          }
-        else
-          message = {
-            type: 'text',
-            text: event.message['text']
-          }
-        end  
-        client.reply_message(event['replyToken'], message)
+        mes(event)
       when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
         response = client.get_message_content(event.message['id'])
         tf = Tempfile.open("content")
