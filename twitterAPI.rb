@@ -107,12 +107,8 @@ def mes(event)
       type: 'text',
       text: 'hello!'
     }
-  elsif event.message['text'] == "image"
-    message = {
-      type: "image",       
-      originalContentUrl: "https://pbs.twimg.com/media/EA1s5InU8AAnUmY.jpg",
-      previewImageUrl: "https://example.com/preview.jpg"
-    }
+  elsif event.message['text'] == "get"
+    getline
   else
     message = {
       type: 'text',
