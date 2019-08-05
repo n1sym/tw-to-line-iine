@@ -20,8 +20,7 @@ def client
   }
 end
 
-ago = (((Time.now).to_s.slice(/\d+/).to_i)-1).to_s #1年前
-kyonen = ago + (Time.now).to_s.slice(4, 6)
+
 
 def toLINE(m)
   message = {
@@ -66,6 +65,8 @@ def client.get_all_tweets(user)
 end
 
 def getiine
+  ago = (((Time.now).to_s.slice(/\d+/).to_i)-1).to_s #1年前
+  kyonen = ago + (Time.now).to_s.slice(4, 6)
   nitizi = kyonen + "のいいね"
   toLINE(nitizi)
   tw = []
