@@ -1,5 +1,4 @@
 require 'line/bot'
-require 'json'
 require 'twitter'
 require 'sinatra'
 
@@ -12,7 +11,6 @@ def client
   }
 end
 
-
 def lineclient
   @lineclient ||= Line::Bot::Client.new { |config|
     config.channel_id = "1605768875"
@@ -21,12 +19,10 @@ def lineclient
   }
 end
 
-
-
-def toLINE(m)
+def toLINE(string)
   message = {
   type: 'text',
-  text: m
+  text: string
   }
   lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",message)
 end
@@ -49,14 +45,10 @@ def toLINEv(url)
   lineclient.push_message("Ua242d28113c3485e05f8ed896887db25",video)
 end
 
-
-
-
-
-def getiine
-
+def getiine(s)
   ago = (((Time.now).to_s.slice(/\d+/).to_i)-1).to_s #1年前
   kyonen = ago + (Time.now).to_s.slice(4, 6)
+  kyonen = s if s.delete("-").to_f.to_s.size() == 10
   nitizi = kyonen + "のいいね"
   toLINE(nitizi)
   tw = []
@@ -76,7 +68,6 @@ def getiine
   end
   
   client.get_all_tweets(928272501943046149).each do |tweet|
-    
     if tweet.created_at.to_s.include?(kyonen)
       tw << tweet
     end
@@ -94,36 +85,30 @@ def getiine
         toLINEi(tweet.media[2].media_url_https)  if tweet.media[2]
         toLINEi(tweet.media[3].media_url_https)  if tweet.media[3]
       end
-      
       toLINE(tweet.full_text)
       toLINE(tweet.url) unless tweet.media[0]
-      
     end
   end
 end
-
 
 get '/' do
   "Hello World"
 end
 
 def mes(event)
-  if event.message['text'] == "hello"
-    message = {
-      type: 'text',
-      text: 'hello!'
-    }
-  elsif event.message['text'] == "get"
-    getiine
+  linetext = event.message['text']
+  if linetext == "get"
+    getiine(linetext)
+  elsif linetext.delete("-").to_f.to_s.size() == 10
+    getiine(linetext)
   else
     message = {
       type: 'text',
-      text: event.message['text']
+      text: linetext
     }
   end  
   lineclient.reply_message(event['replyToken'], message)
 end
-
 
 post '/callback' do
   body = request.body.read
