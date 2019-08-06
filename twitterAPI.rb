@@ -1,21 +1,22 @@
 require 'line/bot'
 require 'twitter'
 require 'sinatra'
+require 'dotenv/load'
 
 def client 
   @twclient ||= Twitter::REST::Client.new { |config|
-    config.consumer_key        = "7p25lNwshZs7U3KXTtiYOC1eQ"
-    config.consumer_secret     = "4Cw01o1okDDPusMbI7tOepxCIqrUuj9SCGWS4P0wyRsyeNn9Hk"
-    config.access_token        = "843737242015211522-0Xs9oPLR9T2SKZ8RdhWFEskeKx44wlK"
-    config.access_token_secret = "wODQ3Oc3UwPY9fUGySPQm0psYTsKLddzfLKSm50N9i35S"
+    config.consumer_key        = ENV['tw_con_KEY']
+    config.consumer_secret     = ENV['tw_con_s_KEY']
+    config.access_token        = ENV['tw_access_t']
+    config.access_token_secret = ENV['tw_access_t_s']
   }
 end
 
 def lineclient
   @lineclient ||= Line::Bot::Client.new { |config|
-    config.channel_id = "1605768875"
-    config.channel_secret = "bb9c0628a8d421316b5d383de5e5883c"
-    config.channel_token = "jm1Ux5cgNtwz2taZo0LAxMdrhVsq5/tz6ZJFa+G4P7rdRp9XYIip0cKlG4NQbx2DZfNHw1qJKoFF1wbRcKDEzgx4HNNjmrjjWOSoSLAMBq2SpEzsJtzh2Ez89EpzpSzHGSt+T0hrrfdNa3Dy0VTYOQdB04t89/1O/w1cDnyilFU="
+    config.channel_id = ENV['li_ch_id']
+    config.channel_secret = ENV['li_ch_secret']
+    config.channel_token = ENV['li_ch_token']
   }
 end
 
